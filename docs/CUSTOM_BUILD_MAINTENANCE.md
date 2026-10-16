@@ -3,6 +3,8 @@
 当前定制基于上游 v1.3.70（`7fa0a092df0f1f1070019782e8608e441a6dda09`），
 维护分支为 `codex/fix-agentrouter-client-headers`。
 `origin` 指向 `https://github.com/jlcodes99/cockpit-tools.git`。
+`fork` 指向自己的 `https://github.com/kingslou/cockpit-tools.git`，
+定制分支保存在该 Fork 中；上游 `main` 用于对照和同步。
 
 ## 必须保留的三项定制
 
@@ -63,6 +65,16 @@ Git 会保留本地提交，并尝试合并上游改动；同一段代码同时�
 验证通过后，为新版本建立独立 tag、备份，并保存新的安装包。
 未来升级的依赖和构建要求以对应上游版本为准。
 
+完成本地提交后，将定制分支保存到自己的 GitHub 仓库：
+
+```powershell
+git push fork codex/fix-agentrouter-client-headers
+# 创建新的定制版本标签后，单独推送该标签：
+# git push fork <实际定制版本标签>
+```
+
+不要用 Fork 页面中的同步操作直接替换定制分支；应在本地审查合并结果后再推送。
+
 ## 安装与回退
 
 源码合并后必须重新构建定制安装包，才能在其他电脑使用新版本。
@@ -80,7 +92,15 @@ git worktree add ../cockpit-tools-before-upgrade backup/custom-before-upgrade-20
 
 ## 跨电脑保存源码
 
-Git 分支和提交目前仅存在本机，没有推送到 GitHub。
+已将定制分支和当前定制基线标签推送至自己的 GitHub Fork。
+其他电脑可直接克隆定制分支，并添加上游来源：
+
+```powershell
+git clone -o fork -b codex/fix-agentrouter-client-headers https://github.com/kingslou/cockpit-tools.git
+Set-Location cockpit-tools
+git remote add origin https://github.com/jlcodes99/cockpit-tools.git
+```
+
 本次另存的 `cockpit-tools-custom-v1.3.70-20261016-repository.zip` 包含已提交源码和
 恢复所需的 `.git` 对象、分支、标签及浅克隆边界；解压即可继续维护。
 解压时保留隐藏的 `.git` 目录，并用 `git status` 确认状态。
