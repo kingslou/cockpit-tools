@@ -1,4 +1,24 @@
-# Cockpit Tools
+# Cockpit Tools · kingslou 定制版
+
+## 本仓库修改了什么
+
+本定制版基于上游 **v1.3.70**，包含以下三项修改：
+
+| 修改 | 当前行为 |
+| --- | --- |
+| **AgentRouter / DeepSeek 兼容修复** | 向 `agentrouter.org` 透传真实客户端的 `User-Agent` 和 `Originator`，修复因标识丢失导致的 `401 unauthorized client detected`；覆盖 Responses 和 Chat Completions 两种网关协议。 |
+| **关闭广告推广** | 关闭顶部广告、赞助商推荐、赞助商线路自动同步及赞赏入口；忽略旧广告缓存，远端推广配置无法重新打开。 |
+| **关闭自动更新与推送** | 关闭自动检查、更新提醒、静默下载和升级说明自动弹窗；屏蔽旧安装的自动更新偏好，保留手动检查入口。 |
+
+**定制文档：**
+
+- **[修改详情与 Windows 编译说明](docs/AGENTROUTER_SOURCE_BUILD.md)**：修复原理、构建环境、安装包生成和验证方法。
+- **[后续升级与保留定制](docs/CUSTOM_BUILD_MAINTENANCE.md)**：合并上游更新、处理冲突、备份、回退与跨电脑使用。
+- **[本地构建开关](build-config.json)**：`promotionsEnabled` 和 `automaticUpdatesEnabled` 均为 `false`。
+
+源码默认分支为 `codex/fix-agentrouter-client-headers`。后续升级需合并上游源码并重新构建定制安装包；直接安装官方版本会覆盖这些修改。
+
+---
 
 [English](README.en.md) · [Portuguese (BR)](README.pt-br.md) · 简体中文
 
