@@ -81,6 +81,13 @@ git worktree add ../cockpit-tools-before-upgrade backup/custom-before-upgrade-20
 ## 跨电脑保存源码
 
 Git 分支和提交目前仅存在本机，没有推送到 GitHub。
+本次另存的 `cockpit-tools-custom-v1.3.70-20261016-repository.zip` 包含已提交源码和
+恢复所需的 `.git` 对象、分支、标签及浅克隆边界；解压即可继续维护。
+解压时保留隐藏的 `.git` 目录，并用 `git status` 确认状态。
+文件名带 `source.zip` 的备份仅含源码，适合阅读或构建，不包含提交历史。
+原仓库为浅克隆，直接生成的 bundle 即使通过 `git bundle verify`，也可能无法独立克隆；
+因此当前备份使用仓库 ZIP，补齐历史后再使用下面的完整 bundle 流程。
+
 可以保存仓库、源码快照或 Git bundle；完成历史补齐后，推荐创建完整 bundle：
 
 ```powershell
