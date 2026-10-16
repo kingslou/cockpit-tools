@@ -1123,7 +1123,15 @@ pub async fn get_announcement_state() -> Result<AnnouncementState, String> {
     })
 }
 
+// promotions_enabled 使用编译时嵌入的本地配置，禁止远端内容覆盖推广开关。
+fn promotions_enabled() -> bool {
+    super::build_config::feature_enabled("promotionsEnabled")
+}
+
 pub async fn get_top_right_ad_state() -> Result<TopRightAdState, String> {
+    if !promotions_enabled() {
+        return Ok(TopRightAdState { ad: None, ads: Vec::new() });
+    }
     let current_version = env!("CARGO_PKG_VERSION");
     let locale = config::get_user_config().language.to_lowercase();
     let raw_payload = load_announcements_raw().await?;
@@ -1150,6 +1158,9 @@ pub async fn get_top_right_ad_state() -> Result<TopRightAdState, String> {
 }
 
 pub async fn get_sponsor_module_state() -> Result<SponsorModuleState, String> {
+    if !promotions_enabled() {
+        return Ok(SponsorModuleState { sponsor_module: None });
+    }
     let current_version = env!("CARGO_PKG_VERSION");
     let locale = config::get_user_config().language.to_lowercase();
     let raw_payload = load_announcements_raw().await?;
@@ -1165,6 +1176,9 @@ pub async fn get_sponsor_module_state() -> Result<SponsorModuleState, String> {
 
 pub async fn sync_sponsor_routes_from_announcements(
 ) -> Result<crate::modules::sponsor_route_sync::SponsorRouteSyncSummary, String> {
+    if !promotions_enabled() {
+        return Ok(Default::default());
+    }
     let raw_payload = load_announcements_raw().await?;
     if !raw_payload.api_relay_enabled {
         return Ok(Default::default());

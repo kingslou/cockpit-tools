@@ -671,7 +671,7 @@ export function useSettingsPageController() {
   const [codexRestartSpecifiedAppOnSwitch, setCodexRestartSpecifiedAppOnSwitch] = useState(false);
   const [codexLocalAccessEntryVisible, setCodexLocalAccessEntryVisible] = useState(true);
   const [codexHideRelayQuota, setCodexHideRelayQuota] = useState(false);
-  const [topRightAdVisible, setTopRightAdVisible] = useState(true);
+  const [topRightAdVisible, setTopRightAdVisible] = useState(false);
   const [antigravityDualSwitchNoRestartEnabled, setAntigravityDualSwitchNoRestartEnabled] = useState(false);
   const [autoSwitchEnabled, setAutoSwitchEnabled] = useState(false);
   const [autoSwitchThreshold, setAutoSwitchThreshold] = useState('20');
@@ -753,7 +753,7 @@ export function useSettingsPageController() {
   const [autoInstall, setAutoInstall] = useState(false);
   const [autoInstallLoaded, setAutoInstallLoaded] = useState(false);
   const autoInstallTouchedRef = useRef(false);
-  const [updateRemindersEnabled, setUpdateRemindersEnabled] = useState(true);
+  const [updateRemindersEnabled, setUpdateRemindersEnabled] = useState(false);
   const [updateRemindersLoaded, setUpdateRemindersLoaded] = useState(false);
   const [updateSettingsLoadFailed, setUpdateSettingsLoadFailed] = useState(false);
   const updateRemindersTouchedRef = useRef(false);
@@ -850,7 +850,7 @@ export function useSettingsPageController() {
         setAutoInstall(Boolean(settings?.auto_install));
       }
       if (!updateRemindersTouchedRef.current) {
-        setUpdateRemindersEnabled(settings?.remind_on_update ?? true);
+        setUpdateRemindersEnabled(settings?.remind_on_update ?? false);
       }
       setAutoInstallLoaded(true);
       setUpdateRemindersLoaded(true);
@@ -1532,7 +1532,7 @@ export function useSettingsPageController() {
           remind_on_update?: boolean;
         }>('get_update_settings');
         setAutoInstall(Boolean(settings.auto_install));
-        setUpdateRemindersEnabled(settings.remind_on_update ?? true);
+        setUpdateRemindersEnabled(settings.remind_on_update ?? false);
       } catch (reloadError) {
         console.error('Failed to reload update settings:', reloadError);
       }
@@ -1783,7 +1783,7 @@ export function useSettingsPageController() {
       );
       setCodexLocalAccessEntryVisible(config.codex_local_access_entry_visible ?? true);
       setCodexHideRelayQuota(config.codex_hide_relay_quota ?? false);
-      setTopRightAdVisible(config.top_right_ad_visible ?? true);
+      setTopRightAdVisible(config.top_right_ad_visible ?? false);
       setAntigravityDualSwitchNoRestartEnabled(
         config.antigravity_dual_switch_no_restart_enabled ?? false
       );

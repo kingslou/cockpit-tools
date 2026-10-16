@@ -4,12 +4,12 @@
     "0.25.3"
   ],
   "topRightAd": null,
-  "apiRelayEnabled": true,
-  "topRightAdsEnabled": true,
+  "apiRelayEnabled": false,
+  "topRightAdsEnabled": false,
   "topRightAds": [
     {
       "id": "top-right-ad-2026-04-shop",
-      "enabled": true,
+      "enabled": false,
       "relayRelated": false,
       "priority": 100,
       "text": "GPT Plus 30天成品号｜各套餐实付代充 可续费 需要的了解下 感谢支持",
@@ -38,8 +38,8 @@
     }
   ],
   "sponsorModule": {
-    "enabled": true,
-    "entryVisible": true,
+    "enabled": false,
+    "entryVisible": false,
     "title": "专属中转站",
     "subtitle": "为 Cockpit Tools 用户提供的合作 API 中转服务，可一键保存并启用到 Codex。",
     "targetVersions": ">=0.25.2",
@@ -72,7 +72,7 @@
         "badge": "AI 中转",
         "description": "APIKEY.FUN 面向开发者提供多模型 API 接入与中转服务，覆盖 Claude / ChatGPT / Grok / Gemini / 智谱 GLM / Kimi / DeepSeek 等平台（每平台一把密钥、按分组计价），适合在 Codex、Claude Code、Gemini CLI 等工具中统一配置使用。",
         "integration": {
-          "enabled": true,
+          "enabled": false,
           "type": "sub2api",
           "baseUrl": "https://api.apikey.fan/v1",
           "baseUrlAliases": [
@@ -81,8 +81,8 @@
             "https://slb.apikey.fun"
           ],
           "wireApi": "responses",
-          "quickConfigure": true,
-          "dashboardCard": true,
+          "quickConfigure": false,
+          "dashboardCard": false,
           "models": [],
           "supportsVision": false,
           "website": "https://apikey.fan/register?aff=cockpit",

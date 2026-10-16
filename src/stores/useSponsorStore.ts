@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import buildConfig from '../../build-config.json';
 import type { SponsorModuleState } from '../types/sponsor';
 import {
   forceRefreshSponsorModuleState,
@@ -23,6 +24,11 @@ export const useSponsorStore = create<SponsorStoreState>((set) => ({
   initialized: false,
 
   fetchState: async (force = false) => {
+    // 本地发行配置优先，远端推荐和线路同步不能重新打开推广。
+    if (!buildConfig.promotionsEnabled) {
+      set({ state: EMPTY_STATE, loading: false, initialized: true });
+      return EMPTY_STATE;
+    }
     set({ loading: true });
     try {
       const nextState = force

@@ -38,18 +38,18 @@ fn default_check_interval() -> u64 {
 }
 
 fn default_remind_on_update() -> bool {
-    true
+    false
 }
 
 impl Default for UpdateSettings {
     fn default() -> Self {
         Self {
-            auto_check: true,
+            auto_check: false,
             last_check_time: 0,
             check_interval_hours: DEFAULT_CHECK_INTERVAL_HOURS,
             auto_install: false,
             last_run_version: String::new(),
-            remind_on_update: true,
+            remind_on_update: false,
             skipped_version: String::new(),
         }
     }
@@ -117,7 +117,7 @@ fn compare_versions(latest: &str, current: &str) -> bool {
 
 /// Check if enough time has passed since last check
 pub fn should_check_for_updates(settings: &UpdateSettings) -> bool {
-    if !settings.auto_check {
+    if !super::build_config::feature_enabled("automaticUpdatesEnabled") || !settings.auto_check {
         return false;
     }
 
@@ -353,6 +353,15 @@ pub fn save_pending_update_notes(
     Ok(())
 }
 
+// apply_local_build_policy 屏蔽旧安装或设置写入中残留的自动更新偏好。
+fn apply_local_build_policy(settings: &mut UpdateSettings) {
+    if !super::build_config::feature_enabled("automaticUpdatesEnabled") {
+        settings.auto_check = false;
+        settings.auto_install = false;
+        settings.remind_on_update = false;
+    }
+}
+
 /// Load update settings from config file
 fn load_update_settings_unlocked() -> Result<UpdateSettings, String> {
     let data_dir = get_data_dir()?;
@@ -399,6 +408,7 @@ fn load_update_settings_unlocked() -> Result<UpdateSettings, String> {
         should_persist = true;
     }
 
+    apply_local_build_policy(&mut settings);
     if should_persist {
         let _ = save_update_settings_unlocked(&settings);
     }
@@ -435,6 +445,7 @@ where
         .map_err(|_| "Update settings lock poisoned".to_string())?;
     let mut settings = load_update_settings_unlocked()?;
     patch(&mut settings);
+    apply_local_build_policy(&mut settings);
     save_update_settings_unlocked(&settings)?;
     Ok(settings)
 }
@@ -525,7 +536,12 @@ mod tests {
     #[test]
     fn test_should_check_for_updates() {
         let mut settings = UpdateSettings::default();
-        assert!(should_check_for_updates(&settings));
+        assert!(!should_check_for_updates(&settings));
+        settings.auto_check = true;
+        assert_eq!(
+            should_check_for_updates(&settings),
+            super::super::build_config::feature_enabled("automaticUpdatesEnabled")
+        );
 
         settings.last_check_time = SystemTime::now()
             .duration_since(UNIX_EPOCH)

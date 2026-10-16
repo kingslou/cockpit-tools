@@ -1,3 +1,4 @@
+import buildConfig from '../../build-config.json';
 import { invoke } from '@tauri-apps/api/core';
 import { normalizeLanguage } from '../i18n';
 import * as accountService from '../services/accountService';
@@ -592,7 +593,7 @@ export function SettingsGeneralPanel(props: SettingsPageViewProps) {
                   <select
                     className="settings-select"
                     value={autoInstall ? 'true' : 'false'}
-                    disabled={!autoInstallLoaded}
+                    disabled={!buildConfig.automaticUpdatesEnabled || !autoInstallLoaded}
                     onChange={(e) => {
                       autoInstallTouchedRef.current = true;
                       setAutoInstall(e.target.value === 'true');
@@ -613,7 +614,7 @@ export function SettingsGeneralPanel(props: SettingsPageViewProps) {
                   <select
                     className="settings-select"
                     value={updateRemindersEnabled ? 'true' : 'false'}
-                    disabled={!updateRemindersLoaded}
+                    disabled={!buildConfig.automaticUpdatesEnabled || !updateRemindersLoaded}
                     onChange={(e) => {
                       updateRemindersTouchedRef.current = true;
                       setUpdateRemindersEnabled(e.target.value === 'true');
@@ -952,7 +953,8 @@ export function SettingsGeneralPanel(props: SettingsPageViewProps) {
                   <label className="switch">
                     <input
                       type="checkbox"
-                      checked={topRightAdVisible}
+                      checked={buildConfig.promotionsEnabled && topRightAdVisible}
+                      disabled={!buildConfig.promotionsEnabled}
                       onChange={(e) => setTopRightAdVisible(e.target.checked)}
                     />
                     <span className="slider"></span>

@@ -54,6 +54,7 @@ import { initializeClassicSidebar } from './utils/classicSidebarStartup';
 import { getAntigravityRuntimeTarget, resolveAntigravityStartupTarget, setAntigravityRuntimeTarget } from './utils/antigravityRuntimeTarget';
 import { useTopRightAdStore } from './stores/useTopRightAdStore';
 import { useSponsorStore } from './stores/useSponsorStore';
+import buildConfig from '../build-config.json';
 import { useRemoteConfigStore } from './stores/useRemoteConfigStore';
 import type { UpdateCheckResult, UpdateInfo } from './components/UpdateNotification';
 import type { RemoteUpdatePromptMode } from './types/remoteConfig';
@@ -908,7 +909,7 @@ function MainApp() {
   const sponsorModuleInitialized = useSponsorStore((state) => state.initialized);
   const fetchRemoteConfigState = useRemoteConfigStore((state) => state.fetchState);
   const sponsorEntryVisible = Boolean(sponsorModuleState.sponsorModule);
-  const [topRightAdVisible, setTopRightAdVisible] = useState(true);
+  const [topRightAdVisible, setTopRightAdVisible] = useState(false);
   const topRightAdVisibleRef = useRef<boolean | null>(null);
   const visibleTopCenterPromoAds = useMemo(
     () => topRightAdState.ads.filter((ad) => isTopPromoAdVisibleOnPage(ad, page)),
@@ -1202,7 +1203,7 @@ function MainApp() {
         if (disposed) {
           return;
         }
-        const nextVisible = config.top_right_ad_visible ?? true;
+        const nextVisible = config.top_right_ad_visible ?? false;
         const previousVisible = topRightAdVisibleRef.current;
         topRightAdVisibleRef.current = nextVisible;
         setTopRightAdVisible(nextVisible);
@@ -1214,8 +1215,8 @@ function MainApp() {
           return;
         }
         console.error('Failed to load top-right ad visibility config:', error);
-        topRightAdVisibleRef.current = true;
-        setTopRightAdVisible(true);
+        topRightAdVisibleRef.current = false;
+        setTopRightAdVisible(false);
       }
     };
 
@@ -1354,7 +1355,7 @@ function MainApp() {
     version: string,
     mode: RemoteUpdatePromptMode,
   ) => {
-    if (!updatePromptPolicyRef.current.openAutomatic(version, mode)) {
+    if (!buildConfig.automaticUpdatesEnabled || !updatePromptPolicyRef.current.openAutomatic(version, mode)) {
       return false;
     }
     openUpdateNotificationDetails('auto');
@@ -1364,7 +1365,7 @@ function MainApp() {
 
   const applyUpdateReminderPreference = useCallback((enabled: boolean, revision?: number) => {
     const policy = updatePromptPolicyRef.current;
-    if (!policy.applyPreference(enabled, revision)) return;
+    if (!policy.applyPreference(buildConfig.automaticUpdatesEnabled && enabled, revision)) return;
     setUpdateRemindersEnabled(policy.enabled);
     if (policy.shouldCloseAutomaticPrompt()) {
       policy.close();
@@ -2325,7 +2326,7 @@ function MainApp() {
 
   // Check for updates on startup
   useEffect(() => {
-    if (!updateRuntimeInfoLoaded) {
+    if (!buildConfig.automaticUpdatesEnabled || !updateRuntimeInfoLoaded) {
       return;
     }
 
@@ -2763,8 +2764,9 @@ function MainApp() {
     writeUpdateLog,
   ]);
 
-  // Version jump detection (post-update changelog)
+  // 本地关闭更新推送时，也不自动弹出升级说明。
   useEffect(() => {
+    if (!buildConfig.automaticUpdatesEnabled) return;
     const detectVersionJump = async () => {
       const versionJumpStartedAt = performance.now();
       try {

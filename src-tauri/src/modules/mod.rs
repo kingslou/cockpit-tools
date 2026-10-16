@@ -1,6 +1,7 @@
 pub mod account;
 pub mod account_index_repair;
 pub mod announcement;
+pub(crate) mod build_config;
 pub mod apikey_fun_links;
 pub mod antigravity_credential;
 pub mod antigravity_legacy_instance;

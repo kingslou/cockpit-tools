@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import buildConfig from '../../build-config.json';
 import type { TopRightAdState } from '../types/topRightAd';
 import { forceRefreshTopRightAdState, getTopRightAdState } from '../services/topRightAdService';
 
@@ -33,7 +34,8 @@ function normalizeTopRightAdState(state: TopRightAdState): TopRightAdState {
 }
 
 function loadCachedTopRightAdState(): TopRightAdState {
-  if (typeof localStorage === 'undefined') {
+  // 关闭推广时忽略旧安装缓存，避免首屏短暂显示广告。
+  if (!buildConfig.promotionsEnabled || typeof localStorage === 'undefined') {
     return EMPTY_STATE;
   }
 
@@ -72,6 +74,11 @@ export const useTopRightAdStore = create<TopRightAdStoreState>((set, get) => ({
   initialized: initialTopRightAdState.ads.length > 0,
 
   fetchState: async () => {
+    if (!buildConfig.promotionsEnabled) {
+      set({ state: EMPTY_STATE, loading: false, initialized: true });
+      persistTopRightAdState(EMPTY_STATE);
+      return EMPTY_STATE;
+    }
     set({ loading: true });
     try {
       const nextState = normalizeTopRightAdState(await getTopRightAdState());
@@ -87,6 +94,11 @@ export const useTopRightAdStore = create<TopRightAdStoreState>((set, get) => ({
   },
 
   forceRefreshState: async () => {
+    if (!buildConfig.promotionsEnabled) {
+      set({ state: EMPTY_STATE, loading: false, initialized: true });
+      persistTopRightAdState(EMPTY_STATE);
+      return EMPTY_STATE;
+    }
     set({ loading: true });
     try {
       const nextState = normalizeTopRightAdState(await forceRefreshTopRightAdState());
