@@ -397,6 +397,7 @@ func (s *relayServer) handleProviderGatewayRequest(c *gin.Context, gateway *prov
 		req.Header.Set("Accept", "text/event-stream")
 	}
 	copyProviderGatewayDiagnosticHeaders(req.Header, c.Request.Header)
+	copyProviderGatewayCodexClientHeaders(req.Header, c.Request.Header, gateway.BaseURL)
 	if isOpenCodeGoGateway(gateway.BaseURL) {
 		applyOpenCodeSessionHeader(req.Header, c.Request.Header, body)
 	}
@@ -553,6 +554,23 @@ func rewriteProviderGatewayBodyModel(body []byte, model string) []byte {
 		return body
 	}
 	return next
+}
+
+// copyProviderGatewayCodexClientHeaders 向 AgentRouter 透传真实客户端标识，
+// 不生成替代标识，也不转发 OAuth、账号或其他凭据。
+func copyProviderGatewayCodexClientHeaders(dst, src http.Header, baseURL string) {
+	if dst == nil || src == nil {
+		return
+	}
+	u, err := url.Parse(baseURL)
+	if err != nil || !strings.EqualFold(u.Hostname(), "agentrouter.org") {
+		return
+	}
+	for _, key := range []string{"User-Agent", "Originator"} {
+		if value := src.Get(key); value != "" {
+			dst.Set(key, value)
+		}
+	}
 }
 
 func copyProviderGatewayDiagnosticHeaders(dst http.Header, src http.Header) {
